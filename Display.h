@@ -14,6 +14,7 @@
     int cursorLocation;
     String cursorIcon;
     Plant plants[];
+    int arraySize;
     
     Display() {
       this->topTxt = "";
@@ -24,6 +25,7 @@
       this->botPlantNum = 0;
       this->cursorLocation = 0;
       this->cursorIcon = "<--";
+      this->arraySize = 0;
       // this->plants[] = plants[];
       /*
       for(int i = 0; i < (5); i++){
@@ -40,12 +42,12 @@
     }
 
 
-    void updatePlants(int topPlant, int botPlant);
-    void updateTxt(String topText, String botText);
+    void updatePlants(Plant internalPlants[], int topPlant, int botPlant, int arraySize);
+    void updateTxt(String topText, String botText, int topPlant, int botPlant);
     void updateCursor(int line);
     
-    void scrollDown();
-    void scrollUp();
+    void scrollDown(Plant *internalPlants, int arraySize);
+    void scrollUp(Plant *internalPlants, int arraySize);
     
     String getTopTxt();
     String getBotTxt();

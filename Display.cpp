@@ -3,14 +3,19 @@
 #include "Plant.h" 
 
 // update the two lines of text with two plants
-void Display::updatePlants(int topPlant, int botPlant){
-  this->topTxt       = this->plants[topPlant].getName();
+void Display::updatePlants(Plant internalPlants[], int topPlant, int botPlant, int arraySize){
+  this->arraySize    = arraySize;
+  this->topPlantNum  = topPlant;
+  this->botPlantNum  = botPlant; 
+  this->topTxt       = internalPlants[topPlant].getName();
   this->topTxtLenght = this->topTxt.length();
-  this->botTxt       = this->plants[botPlant].getName();
+  this->botTxt       = internalPlants[botPlant].getName();
   this->botTxtLenght = this->botTxt.length();
 }
 // update the two lines of text with two text strings
-void Display::updateTxt(String topText, String botText){
+void Display::updateTxt(String topText, String botText, int topPlant, int botPlant){
+  this->topPlantNum  = topPlant; 
+  this->botPlantNum  = botPlant; 
   this->topTxt       = topText;
   this->topTxtLenght = topText.length();
   this->botTxt       = botText;
@@ -19,10 +24,10 @@ void Display::updateTxt(String topText, String botText){
 // set the cursor at a specific line
 void Display::updateCursor(int line){
   if(line = 0){
-    this->updateTxt(topTxt + cursorIcon, botTxt);
+    this->updateTxt(this->topTxt + this->cursorIcon, this->botTxt, this->topPlantNum, this->botPlantNum);
     cursorLocation = line; // placed here so it isn't changed on error
   } else if(line = 1){
-    this->updateTxt(topTxt, botTxt + cursorIcon);
+    this->updateTxt(this->topTxt, this->botTxt + this->cursorIcon, this->topPlantNum, this->botPlantNum);
     cursorLocation = line;
   } else { 
     Serial.println("ERROR in Display.updateCursor()"); 
@@ -30,24 +35,24 @@ void Display::updateCursor(int line){
 }
 
 // scroll down in teh displayed plants
-void Display::scrollDown(){
+void Display::scrollDown(Plant *internalPlants, int arraySize){
   if(cursorLocation=0) {
     this->updateCursor(1);
   } else if(this->cursorLocation=1) {
     if(this->botPlantNum < 5){
-      this->updatePlants(this->topPlantNum++, this->botPlantNum++);
+      this->updatePlants(internalPlants, this->topPlantNum++, this->botPlantNum++, arraySize);
     }
   } else {
     Serial.println("ERROR in Display.scrollDown()");
   }
 }
 // scroll up in the displayed plants
-void Display::scrollUp(){
+void Display::scrollUp(Plant *internalPlants, int arraySize){
   if(cursorLocation=1) {
     this->updateCursor(0);
   } else if(cursorLocation=0) {
     if(this->topPlantNum > 0){
-      this->updatePlants(this->topPlantNum--, this->botPlantNum--);
+      this->updatePlants(internalPlants, this->topPlantNum--, this->botPlantNum--, arraySize);
     }
   } else {
     Serial.println("ERROR in Display.scrollUp()");
