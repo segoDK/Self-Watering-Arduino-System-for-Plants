@@ -19,6 +19,7 @@
         this->minMoist = minMoist;
         this->maxMoist = maxMoist;
         this->prefDirLight = prefDirLight;
+        this->prefIndLight = 8*60 - this->prefDirLight; // hours in min
       }
 
       void setName(String plantName);

@@ -54,9 +54,9 @@ class Button {
 };
 
 
-//////////////////////////
-//  Internal variables  //
-//////////////////////////
+////////////////////////
+//  Internal Objects  //
+////////////////////////
 // buttons to interact with the menu, objects defined with a pin
 Button *buttonUp = new Button(7);
 Button *buttonEnter = new Button(8);
@@ -75,14 +75,20 @@ Plant* plants[]= {
 
 int pASize = sizeof(plants)/2; // whole size divided by size of a char
 
-
-// initialize the library by associating any needed LCD interface pin
+// initialize the library variables by associating any needed LCD interface pin
 // with the arduino pin number it is connected to
 const int rs = 11, en = 12, d4 = 2, d5 = 3, d6 = 4, d7 = 5;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 // make a display object (constructor defined in Display.h)
 Display *LCD = new Display();
+
+
+//////////////////////////
+//  Internal Variables  //
+//////////////////////////
+bool displayOn = false;
+
 
 
 void setup() {
@@ -94,9 +100,12 @@ void setup() {
   lcd.begin(16, 2);
   // Print a message to the LCD.
   // first and second plant on display
-  LCD->updatePlants(*plants, 0, 1, pASize);
+  LCD->updatePlants(plants, 0, 1, pASize);
+  LCD->updateCursor(0, plants, 0, 1, pASize);
   updateDisplay();
-  
+
+  // print plants to see if their data are alright
+  printListOfPlants();
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // this below fucks it up and stops the Arduino code. But I get no error message when compiling. The list should be changed. It certainly doesn't work as it is! //
@@ -111,32 +120,36 @@ void setup() {
   Serial.println(timestamp() + "LCD have been printed/displayed");
 }
 
+
+
 void loop() {
   // madeshift listeners
-  //if(millis() > buttonDown->getTimestamp() + 500/*milli sec delay*/){
-    bool tempDown = buttonDown->isItPressed();
-    if(tempDown){
-      LCD->scrollDown(*plants, pASize);
-      Serial.print(timestamp() + "Down pressed = ");
-      Serial.println(String(tempDown));
-    }
-  //}
-  //if(millis() > buttonEnter->getTimestamp() + 500){
-    bool tempEnter = buttonEnter->isItPressed();
-    if(tempEnter){
-      lcd.noDisplay();
-      Serial.print(timestamp() + "Enter pressed = ");
-      Serial.println(String(tempEnter));
-    }
-  //}
-  //if(millis() > buttonUp->getTimestamp() + 500){
-    bool tempUp = buttonUp->isItPressed();
-    if(tempUp){
-      LCD->scrollUp(*plants, pASize);
-      Serial.print(timestamp() + "Up pressed = ");
-      Serial.println(String(tempUp));
-    }
-  //}
+  bool tempDown = buttonDown->isItPressed();
+  if(tempDown){
+    // timestamp added to Serial print of action notification
+    Serial.print(timestamp() + "Down pressed = ");
+    Serial.println(String(tempDown));
+    
+    LCD->scrollDown(plants, pASize);
+    updateDisplay();
+  }
+  bool tempEnter = buttonEnter->isItPressed();
+  if(tempEnter){
+    // timestamp added to Serial print of action notification
+    Serial.print(timestamp() + "Enter pressed = ");
+    Serial.println(String(tempEnter));
+    
+    toggleDisplay();
+  }
+  bool tempUp = buttonUp->isItPressed();
+  if(tempUp){
+    // timestamp added to Serial print of action notification
+    Serial.print(timestamp() + "Up pressed = ");
+    Serial.println(String(tempUp));
+    
+    LCD->scrollUp(plants, pASize);
+    updateDisplay();
+  }
   
   /*
   // Turn off the display:
@@ -148,31 +161,56 @@ void loop() {
   */
   
 }
+////////////////////////
+// Internal Functions //
+////////////////////////
 
-
+// sets text on top and bottom row of LCD to text Strings sat in Display.h
 void updateDisplay(){
-  lcd.setCursor(0, 0);
-  lcd.print(LCD->getTopTxt()); Serial.println(timestamp() + "top text: " + LCD->getTopTxt());
-  lcd.setCursor(0, 1); 
-  lcd.print(LCD->getBotTxt()); Serial.println(timestamp() + "bot text: " + LCD->getBotTxt());
+  lcd.clear();
+  
+  lcd.setCursor(0, 0); // where to pring
+  lcd.print(LCD->getTopTxt()); // print the text from Display.h
+  Serial.println(timestamp() + "top text: " + LCD->getTopTxt());
+  
+  lcd.setCursor(0, 1); // where to pring
+  lcd.print(LCD->getBotTxt()); // print the text from Display.h
+  Serial.println(timestamp() + "bot text: " + LCD->getBotTxt());
 }
 
+// turn display on or off. 
+// Always inverse of the current state
+void toggleDisplay(){
+  if(displayOn) {
+    lcd.noDisplay();
+    displayOn = false;
+  } else {
+    lcd.display();
+    displayOn = true;
+  }
+}
 
+// make serial print of plants list with their attributes
+void printListOfPlants(){
+  Serial.println("\nList contains these " + String(pASize) + " plants:");
+  for(int i = 0; i < pASize; i++){
+    Serial.println("Name: " + String(plants[i]->getName()) + ", ");
+    Serial.println("Min moist: " + String(plants[i]->getMinMoist()) + "%, ");
+    Serial.println("Max moist: " + String(plants[i]->getMaxMoist()) + "%, ");
+    Serial.println("Prefered direct light: " + String(plants[i]->getDirLight()) + " min,");
+    Serial.println("Prefered indirect light: " + String(plants[i]->getIndLight()) + " min \n");
+  }
+}
 
-// doesn't work - but should make a propper timestamp for the Serial.print()
+// timestamp for the Serial.print() in format "hours:minutes:seconds:milliseconds"
 String timestamp(){
-  long tempMilli = millis();
-  long tempSec = tempMilli/1000;
-  long tempMin = tempSec/60;
-  long tempHour = tempMin/60;
-
-  tempMin =- -tempHour*60;
-  tempSec =- -tempMin*60;
-  tempMilli =- -tempMin*100;
+  long milliSec = millis();
+  long tempSec = milliSec/1000;
+  long tempMin = (tempSec/60);
+  long tempHour = (tempMin/60);
   
-  return(String(tempHour) + ":"
-       + String(tempMin) + ":"
-       + String(tempSec) + ":"
-       + String(tempMilli) + " - ");
-       
+  return(String(tempHour%24) + ":"
+       + String(tempMin%60) + ":"
+       + String(tempSec%60) + ":"
+       + String(milliSec - ((milliSec/1000)*1000)) + " - ");
 }

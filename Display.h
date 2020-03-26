@@ -42,12 +42,12 @@
     }
 
 
-    void updatePlants(Plant internalPlants[], int topPlant, int botPlant, int arraySize);
+    void updatePlants(Plant *internalPlants[], int topPlant, int botPlant, int arraySize);
     void updateTxt(String topText, String botText, int topPlant, int botPlant);
-    void updateCursor(int line);
+    void updateCursor(int line, Plant *internalPlants[], int topPlant, int botPlant, int arraySize);
     
-    void scrollDown(Plant *internalPlants, int arraySize);
-    void scrollUp(Plant *internalPlants, int arraySize);
+    void scrollDown(Plant *internalPlants[], int arraySize);
+    void scrollUp(Plant *internalPlants[], int arraySize);
     
     String getTopTxt();
     String getBotTxt();
