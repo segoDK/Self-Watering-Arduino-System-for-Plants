@@ -2,57 +2,8 @@
 #include "Arduino.h"
 #include "Plant.h"
 #include "Display.h"
+#include "Button.h"
 #include <LiquidCrystal.h>
-
-
-
-// Class for buttons
-class Button {
-  private:
-    int pin; // its pin
-    bool pressed; // if button is pressed
-    bool tempPress; // if button is pressed this moment
-    long timestamp; // time of buttonpress
-    
-  public:
-    Button(int pin) {
-      // 'this->' used to make the difference between the attributes of 
-      // the class and the local variables created from the parameter.
-      this->pin = pin;
-      this->pressed = false;
-      pinMode(this->pin, INPUT);
-      this->timestamp = millis();
-    }
-    void setPin(int pin) {
-      this->pin = pin;
-    }
-    void nowPressed() {
-      this->pressed = true;
-    }
-    void nowReleased() {
-      this->pressed = false;
-    }
-    int getPin() {
-      return(this->pin);
-    }
-    long getTimestamp(){
-      return(timestamp);
-    }
-    bool isItPressed() {
-      if(millis() >= this->timestamp && !tempPress){
-        this->tempPress = digitalRead(this->pin);
-        this->pressed = false;
-      }
-      if(tempPress && !digitalRead(this->pin)){
-        this->timestamp = millis();
-        this->pressed = true;
-        this->tempPress = false;
-      }
-      return(this->pressed);
-    }
-    
-};
-
 
 ////////////////////////
 //  Internal Objects  //
@@ -106,15 +57,6 @@ void setup() {
 
   // print plants to see if their data are alright
   printListOfPlants();
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // this below fucks it up and stops the Arduino code. But I get no error message when compiling. The list should be changed. It certainly doesn't work as it is! //
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  /*
-  for(int i = 0; i < sizeof(plants)/2; i++){ // whole size divided by size of a char
-    LCD->addPlant(*plants[i]);
-  }
-  */
   
   lcd.display();
   Serial.println(timestamp() + "LCD have been printed/displayed");
@@ -151,16 +93,10 @@ void loop() {
     updateDisplay();
   }
   
-  /*
-  // Turn off the display:
-  lcd.noDisplay();
-  delay(500);
-  // Turn on the display:
-  lcd.display();
-  delay(500);
-  */
-  
 }
+
+
+
 ////////////////////////
 // Internal Functions //
 ////////////////////////

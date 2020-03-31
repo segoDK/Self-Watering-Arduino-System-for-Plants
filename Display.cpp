@@ -55,7 +55,7 @@ void Display::scrollDown(Plant* internalPlants[], int arraySize){
     this->updateCursor(1, internalPlants, this->topPlantNum, this->botPlantNum, arraySize);
     Serial.println(" - cursor moves");
   } else if(this->cursorLocation == 1) {
-    if(this->botPlantNum < arraySize){
+    if(this->botPlantNum < arraySize-1){
       this->topPlantNum++;
       this->botPlantNum++;
       this->updatePlants(internalPlants, this->topPlantNum, this->botPlantNum, arraySize);

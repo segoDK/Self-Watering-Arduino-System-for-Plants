@@ -27,6 +27,7 @@
       void setMaxMoist(int maxMoist);
       void setDirLight(int prefDirLight);
       void setIndLight(int prefIndLight);
+      
       String getName();
       int getMinMoist();
       int getMaxMoist();
