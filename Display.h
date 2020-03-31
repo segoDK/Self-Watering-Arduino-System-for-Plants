@@ -9,8 +9,8 @@
   
   public:
     // variables for lcd display
-    String topTxt; int topTxtLenght; int topPlantNum; 
-    String botTxt; int botTxtLenght; int botPlantNum;
+    String topTxt; int topTxtLenght; long topPlantNum; 
+    String botTxt; int botTxtLenght; long botPlantNum;
     int cursorLocation;
     String cursorIcon;
     Plant plants[];

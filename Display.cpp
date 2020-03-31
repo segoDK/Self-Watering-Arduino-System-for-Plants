@@ -39,7 +39,7 @@ void Display::updateCursor(int line, Plant* internalPlants[], int topPlant, int 
     this->cursorLocation = line; // placed here so it isn't changed on error
     Serial.println(" - cursor location sat to: " + String(cursorLocation) + ". Txt says: " + this->topTxt);
   } else if(line == 1){
-    this->updateTxt(internalPlants[topPlant]->getName(), String(internalPlants[botPlant]->getName() + " " + this->cursorIcon), topPlant, topPlant);
+    this->updateTxt(internalPlants[topPlant]->getName(), String(internalPlants[botPlant]->getName() + " " + this->cursorIcon), topPlant, botPlant);
     this->cursorLocation = line; // -||- also
     Serial.println(" - cursor location sat to: " + String(cursorLocation) + ". Txt says: " + this->botTxt);
   } else {
@@ -59,7 +59,7 @@ void Display::scrollDown(Plant* internalPlants[], int arraySize){
       this->topPlantNum++;
       this->botPlantNum++;
       this->updatePlants(internalPlants, this->topPlantNum, this->botPlantNum, arraySize);
-      this->updateCursor(1, internalPlants, this->topPlantNum, this->botPlantNum, arraySize);
+      this->updateCursor(this->cursorLocation, internalPlants, this->topPlantNum, this->botPlantNum, arraySize);
     }
     Serial.println(" - going to plant " + String(this->botPlantNum) + "/" + String(arraySize));
   } else {
@@ -74,11 +74,11 @@ void Display::scrollUp(Plant* internalPlants[], int arraySize){
     this->updateCursor(0, internalPlants, this->topPlantNum, this->botPlantNum, arraySize);
     Serial.println(" - cursor moves");
   } else if(cursorLocation == 0) {
-    if(this->topPlantNum > 0){
+    if(this->topPlantNum >= 1){
       this->botPlantNum--;
       this->topPlantNum--;
       this->updatePlants(internalPlants, this->topPlantNum, this->botPlantNum, arraySize);
-      this->updateCursor(0, internalPlants, this->topPlantNum, this->botPlantNum, arraySize);
+      this->updateCursor(this->cursorLocation, internalPlants, this->topPlantNum, this->botPlantNum, arraySize);
     }
     Serial.println(" - going to plant " + String(this->botPlantNum) + "/" + String(arraySize));
   } else {
