@@ -38,8 +38,21 @@ Display *LCD = new Display();
 //////////////////////////
 //  Internal Variables  //
 //////////////////////////
+// sensor pins
+int s0pin = A0;
+int s1pin = A1;
+int s2pin = A2;
+
+// motor pins
+int m0pin = 5;
+int m1pin = 6;
+
+// display
 bool displayOn = false;
 
+// for watering
+bool wateringNecessary = false;
+long wateringStart = 0;
 
 
 void setup() {
@@ -57,9 +70,12 @@ void setup() {
 
   // print plants to see if their data are alright
   printListOfPlants();
-  
   lcd.display();
   Serial.println(timestamp() + "LCD have been printed/displayed");
+
+  // initiate pins for sensors and motor
+  pinInit();
+  Serial.println(timestamp() + "pins initiated");
 }
 
 
@@ -149,4 +165,45 @@ String timestamp(){
        + String(tempMin%60) + ":"
        + String(tempSec%60) + ":"
        + String(milliSec - ((milliSec/1000)*1000)) + " - ");
+}
+
+
+
+
+
+// -------------------------------------------------------------------------------------------------------------------------- //
+
+/////////////////
+// IN PROGRESS //
+/////////////////
+
+// to initiate pins
+void pinInit(){
+  // sensor pins
+  pinMode(s0pin, INPUT);
+  pinMode(s1pin, INPUT);
+  pinMode(s2pin, INPUT);
+  
+  // motor pins
+  pinMode(m0pin, OUTPUT);
+  pinMode(m1pin, OUTPUT);
+}
+
+// read a sensor (necessary with a function for this?)
+long sensorRead(int pin){
+  return(analogRead(pin));
+}
+
+// give plant a specific amount of water (hmm, maybe this isn't the smartest thing though)
+void waterPlant(bool, necessary, int amount/*[cl]*/){
+  if(necessary){
+    wateringStart = millis();
+    digitalWrite(m0pin);
+    wateringNecessary = false;
+  }
+}
+
+// calculates duration of motor activity necessary for watering
+long waterAmountToWateringDuration(int amount/*[cl]*/){
+  // math plz
 }
