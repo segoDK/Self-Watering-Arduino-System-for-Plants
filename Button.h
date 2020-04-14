@@ -21,6 +21,7 @@
       }
       
       void setPin(int pin);
+      void init();
       
       void nowPressed();
       void nowReleased();

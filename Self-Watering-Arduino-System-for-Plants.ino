@@ -9,9 +9,9 @@
 //  Internal Objects  //
 ////////////////////////
 // buttons to interact with the menu, objects defined with a pin
-Button *buttonUp = new Button(7);
-Button *buttonEnter = new Button(8);
-Button *buttonDown = new Button(9);
+Button *buttonUp = new Button(10);
+Button *buttonEnter = new Button(11);
+Button *buttonDown = new Button(12);
 
 // make plant objects (constructor defined in Plant.h)
 // - Plant(plantName, minMoist, maxMoist, prefDirLight) - 
@@ -28,7 +28,7 @@ int pASize = sizeof(plants)/2; // whole size divided by size of a char
 
 // initialize the library variables by associating any needed LCD interface pin
 // with the arduino pin number it is connected to
-const int rs = 11, en = 12, d4 = 2, d5 = 3, d6 = 4, d7 = 5;
+const int rs = 12, en = 13, d4 = 2, d5 = 3, d6 = 4, d7 = 5;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 // make a display object (constructor defined in Display.h)
@@ -54,6 +54,18 @@ bool displayOn = false;
 bool wateringNecessary = false;
 long wateringStart = 0;
 
+
+// Ultrasonic sensor
+int trigPin = 7;    // Trigger
+int echoPin = 8;    // Echo
+long duration, cm, volume;
+
+// water tank (all in cm)
+long tankWidth = 20;
+long tankDepth = 20;
+long tankHeight = 25;
+
+long distFromSensor = 5; // magic number for distance between sensor and water surface
 
 void setup() {
   Serial.begin(9600);
@@ -179,14 +191,18 @@ String timestamp(){
 
 // to initiate pins
 void pinInit(){
-  // sensor pins
-  pinMode(s0pin, INPUT);
-  pinMode(s1pin, INPUT);
-  pinMode(s2pin, INPUT);
+  // sensor pins set to INPUT by function in Button class
+  buttonUp->init();
+  buttonEnter->init();
+  buttonDown->init();
   
   // motor pins
   pinMode(m0pin, OUTPUT);
   pinMode(m1pin, OUTPUT);
+
+  // ultrasonic sensor pins
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
 }
 
 // read a sensor (necessary with a function for this?)
@@ -194,11 +210,39 @@ long sensorRead(int pin){
   return(analogRead(pin));
 }
 
+long readWaterlevel(){
+  // sensor is triggered by a HIGH pulse of 10 or more microseconds
+  // short LOW pulse beforehand to ensure clean HIGH pulse
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(5);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+ 
+  // Read the signal from the sensor: a HIGH pulse whose
+  // duration is the time (in microseconds) from the sending
+  // of the ping to the reception of its echo off of an object.
+  pinMode(echoPin, INPUT);
+  duration = pulseIn(echoPin, HIGH);
+ 
+  // Convert the time into a distance
+  cm = (duration/2) / 29.1;     // divided by 29.1 or multiplied by 0.0343
+
+  // then convert into volume
+  
+
+  Serial.print("in, ");
+  Serial.print(cm);
+  Serial.print("cm");
+  Serial.println();
+}
+
+
 // give plant a specific amount of water (hmm, maybe this isn't the smartest thing though)
-void waterPlant(bool, necessary, int amount/*[cl]*/){
+void waterPlant(bool necessary, int amount/*[cl]*/){
   if(necessary){
     wateringStart = millis();
-    digitalWrite(m0pin);
+    digitalWrite(m0pin, HIGH);
     wateringNecessary = false;
   }
 }

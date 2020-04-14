@@ -4,6 +4,9 @@
 void Button::setPin(int pin) {
   this->pin = pin;
 }
+void Button::init(){
+  pinMode(this->pin, INPUT);
+}
 void Button::nowPressed() {
   this->pressed = true;
 }
