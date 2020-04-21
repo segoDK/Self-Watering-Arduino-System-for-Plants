@@ -9,9 +9,9 @@
 //  Internal Objects  //
 ////////////////////////
 // buttons to interact with the menu, objects defined with a pin
-Button *buttonUp = new Button(10);
-Button *buttonEnter = new Button(11);
-Button *buttonDown = new Button(12);
+Button *buttonUp = new Button(9);
+Button *buttonEnter = new Button(10);
+Button *buttonDown = new Button(11);
 
 // make plant objects (constructor defined in Plant.h)
 // - Plant(plantName, minMoist, maxMoist, prefDirLight) - 
@@ -32,8 +32,8 @@ const int rs = 12, en = 13, d4 = 2, d5 = 3, d6 = 4, d7 = 5;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 // make a display object (constructor defined in Display.h)
-Display *LCD = new Display();
-
+Display *menuDisplay = new Display();
+Display *statsDisplay = new Display();
 
 //////////////////////////
 //  Internal Variables  //
@@ -76,9 +76,9 @@ void setup() {
   lcd.begin(16, 2);
   // Print a message to the LCD.
   // first and second plant on display
-  LCD->updatePlants(plants, 0, 1, pASize);
-  LCD->updateCursor(0, plants, 0, 1, pASize);
-  updateDisplay();
+  menuDisplay->updatePlants(plants, 0, 1, pASize);
+  menuDisplay->updateCursor(0, plants, 0, 1, pASize);
+  updateMenuDisplay();
 
   // print plants to see if their data are alright
   printListOfPlants();
@@ -100,8 +100,8 @@ void loop() {
     Serial.print(timestamp() + "Down pressed = ");
     Serial.println(String(tempDown));
     
-    LCD->scrollDown(plants, pASize);
-    updateDisplay();
+    menuDisplay->scrollDown(plants, pASize);
+    updateMenuDisplay();
   }
   bool tempEnter = buttonEnter->isItPressed();
   if(tempEnter){
@@ -110,6 +110,7 @@ void loop() {
     Serial.println(String(tempEnter));
     
     toggleDisplay();
+    readWaterlevel();
   }
   bool tempUp = buttonUp->isItPressed();
   if(tempUp){
@@ -117,8 +118,8 @@ void loop() {
     Serial.print(timestamp() + "Up pressed = ");
     Serial.println(String(tempUp));
     
-    LCD->scrollUp(plants, pASize);
-    updateDisplay();
+    menuDisplay->scrollUp(plants, pASize);
+    updateMenuDisplay();
   }
   
 }
@@ -130,16 +131,27 @@ void loop() {
 ////////////////////////
 
 // sets text on top and bottom row of LCD to text Strings sat in Display.h
-void updateDisplay(){
+void updateMenuDisplay(){
   lcd.clear();
   
   lcd.setCursor(0, 0); // where to pring
-  lcd.print(LCD->getTopTxt()); // print the text from Display.h
-  Serial.println(timestamp() + "top text: " + LCD->getTopTxt());
+  lcd.print(menuDisplay->getTopTxt()); // print the text from Display.h
+  Serial.println(timestamp() + "top text: " + menuDisplay->getTopTxt());
   
   lcd.setCursor(0, 1); // where to pring
-  lcd.print(LCD->getBotTxt()); // print the text from Display.h
-  Serial.println(timestamp() + "bot text: " + LCD->getBotTxt());
+  lcd.print(menuDisplay->getBotTxt()); // print the text from Display.h
+  Serial.println(timestamp() + "bot text: " + menuDisplay->getBotTxt());
+}
+void updateStatsDisplay(){
+  lcd.clear();
+  
+  lcd.setCursor(0, 0); // where to pring
+  lcd.print(statsDisplay->getTopTxt()); // print the text from Display.h
+  Serial.println(timestamp() + "top text: " + statsDisplay->getTopTxt());
+  
+  lcd.setCursor(0, 1); // where to pring
+  lcd.print(statsDisplay->getBotTxt()); // print the text from Display.h
+  Serial.println(timestamp() + "bot text: " + statsDisplay->getBotTxt());
 }
 
 // turn display on or off. 
@@ -229,12 +241,11 @@ long readWaterlevel(){
   cm = (duration/2) / 29.1;     // divided by 29.1 or multiplied by 0.0343
 
   // then convert into volume
-  
 
-  Serial.print("in, ");
-  Serial.print(cm);
-  Serial.print("cm");
-  Serial.println();
+
+  
+  Serial.println(cm + " cm");
+  statsDisplay()->updateText(String topText, String botText, int topPlant, int botPlant);
 }
 
 
