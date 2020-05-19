@@ -1,1 +1,0 @@
-I stedet for UpdateText() for Display.h skal der tilføjes en liste af Strings under klassen som indeholder linjerne displayet skal kunne vise. Denne skal kunne overføres og der skal kunne tilføjes, fjernes og ændres i listens linjer. Måske er tilføje og ændre nok. 
